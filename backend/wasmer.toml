@@ -1,0 +1,26 @@
+# Wasmer Edge package for the API + the built SPA (one app, one origin).
+#
+#   wasmer deploy        # from this directory
+#
+# The SPA must be built first:  cd frontend && npm run build:spa
+#
+# Secrets (DB, APP_KEY, MAIL, CORS…) are NOT read from a .env file here:
+#   wasmer app secrets create KEY value
+# Laravel picks them up from the environment, which takes precedence over .env.
+
+[dependencies]
+"php/php" = "=8.3.4"
+
+[fs]
+"/app/" = "."
+# Own php.ini, mounted away from Laravel's config/ directory.
+"/deploy" = "deploy"
+
+[[command]]
+name = "run"
+module = "php/php:php"
+runner = "wasi"
+
+[command.annotations.wasi]
+main-args = ["-t", "/app/public", "-S", "localhost:8080"]
+env = ["PHPRC=/deploy/"]
